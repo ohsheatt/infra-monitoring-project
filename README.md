@@ -1,16 +1,8 @@
 # infra-monitoring-project
 
-Учебный проект для мониторинга доступности API, анализа журналов и запуска API с обратным прокси в Docker Compose.
-
-## Требования
-
-- Bash
-- `curl`
-- Docker Desktop с Docker Compose
-
 ## Проверка API
 
-Передайте URL первым аргументом. HTTP-код `200` считается успехом; при успехе скрипт возвращает `0`, иначе — `1`.
+Передайте URL первым аргументом. HTTP-код `200` считается успехом: скрипт возвращает `0`. При другом коде ответа он возвращает `1`.
 
 ```bash
 bash check_api.sh https://httpbin.org/status/200
@@ -19,11 +11,10 @@ bash check_api.sh https://httpbin.org/status/404
 
 ## Анализ логов
 
-Скрипт создаёт тестовый `access.log` из 300 записей, затем выводит общее количество запросов, три наиболее частых IP и количество ответов 4xx/5xx. Можно передать другой путь к файлу:
+Скрипт создаёт файл `access.log` из 300 записей и выводит общее количество запросов, три наиболее частых IP-адреса и количество ответов с кодами 4xx и 5xx.
 
 ```bash
 bash analyze_logs.sh
-bash analyze_logs.sh work/access.log
 ```
 
 ## Запуск контейнеров
@@ -36,9 +27,9 @@ docker compose ps
 curl http://localhost:80
 ```
 
-Ожидаемый текст ответа: `Monitoring Service Active`.
+Ожидаемый ответ: `Monitoring Service Active`.
 
-Остановка:
+Чтобы остановить контейнеры, выполните:
 
 ```bash
 docker compose down
@@ -48,29 +39,29 @@ docker compose down
 
 ## GitHub Actions
 
-Workflow `.github/workflows/ci.yml` запускается при создании Pull Request в `main`. Он проверяет синтаксис Bash-скриптов и выполняет проверку тестового URL.
+Workflow `.github/workflows/ci.yml` запускается при создании Pull Request в `main`. Он проверяет синтаксис Bash-скриптов и запускает проверку тестового URL.
 
 ## Безопасная передача проекта на сервер по SSH/SCP
 
-Сначала создайте SSH-ключ (если у вас его ещё нет):
+Создайте SSH-ключ, если у вас его ещё нет:
 
 ```bash
 ssh-keygen -t ed25519 -C "student@example.com"
 ```
 
-Добавьте публичный ключ на сервер:
+Скопируйте публичный ключ на сервер:
 
 ```bash
 ssh-copy-id USER@SERVER_HOST
 ```
 
-Подключитесь и проверьте соединение:
+Проверьте подключение:
 
 ```bash
 ssh USER@SERVER_HOST
 ```
 
-Из каталога проекта передайте архив на сервер и распакуйте его:
+Из каталога проекта создайте архив, передайте его на сервер и распакуйте:
 
 ```bash
 tar -czf infra-monitoring-project.tar.gz --exclude=.git --exclude='*.log' .
@@ -78,4 +69,4 @@ scp infra-monitoring-project.tar.gz USER@SERVER_HOST:~/
 ssh USER@SERVER_HOST "mkdir -p ~/infra-monitoring-project && tar -xzf ~/infra-monitoring-project.tar.gz -C ~/infra-monitoring-project"
 ```
 
-Здесь `USER` и `SERVER_HOST` заменяются именем пользователя и адресом вашего сервера. Не передавайте закрытый SSH-ключ; на сервер копируется только публичный ключ.
+Замените `USER` и `SERVER_HOST` на имя пользователя и адрес сервера. На сервер копируется только публичный SSH-ключ; закрытый ключ никому не передавайте.
